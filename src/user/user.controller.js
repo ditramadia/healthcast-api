@@ -1,8 +1,15 @@
 const express = require("express");
 const router = express.Router();
-const admin = require("../config/firebase-admin");
-const db = require("../db");
+const {
+  isUserUidExists,
+  isUserEmailExists,
+  createNewUser,
+} = require("./user.service");
 
+/**
+ * REGISTER
+ * POST /register
+ */
 router.post("/register", async (req, res) => {
   const { uid, email, fullName } = req.body;
 
@@ -24,18 +31,21 @@ router.post("/register", async (req, res) => {
     });
   }
 
-  const userSnapshot = await db.collection("users").doc(uid).get();
-  if (userSnapshot.exists) {
+  const isUidExists = await isUserUidExists(uid);
+  if (isUidExists) {
     return res.status(400).json({
-      message: "User already registered",
+      message: "uid is already registered",
     });
   }
 
-  await db.collection("users").doc(uid).set({
-    email,
-    full_name: fullName,
-    created_at: admin.firestore.FieldValue.serverTimestamp(),
-  });
+  const isEmailExists = await isUserEmailExists(email);
+  if (isEmailExists) {
+    return res.status(400).json({
+      message: "Email is already registered",
+    });
+  }
+
+  await createNewUser({ uid, email, fullName });
 
   res.status(201).json({
     message: "User created successfully",
