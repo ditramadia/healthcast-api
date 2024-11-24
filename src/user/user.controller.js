@@ -1,62 +1,30 @@
 const express = require("express");
+const { isUserUidExists, getUserDataByUid } = require("./user.service");
 const router = express.Router();
-const {
-  isUserUidExists,
-  isUserEmailExists,
-  createNewUser,
-} = require("./user.service");
 
 /**
- * REGISTER
- * POST /register
+ * GET USER BY UID
+ * GET /users/:uid
  */
-router.post("/register", async (req, res) => {
+router.get("/:uid", async (req, res) => {
+  const { uid } = req.params;
   try {
-    const { uid, email, fullName } = req.body;
-
-    if (!uid) {
-      return res.status(400).json({
-        message: "Missing required field: uid",
+    const isUserExists = await isUserUidExists(uid);
+    if (!isUserExists) {
+      return res.status(404).json({
+        message: `User with uid ${uid} does not exists`,
       });
     }
 
-    if (!email) {
-      return res.status(400).json({
-        message: "Missing required field: Email",
-      });
-    }
+    const userData = await getUserDataByUid(uid);
 
-    if (!fullName) {
-      return res.status(400).json({
-        message: "Missing required field: Password",
-      });
-    }
-
-    const isUidExists = await isUserUidExists(uid);
-    if (isUidExists) {
-      return res.status(400).json({
-        message: "uid is already registered",
-      });
-    }
-
-    const isEmailExists = await isUserEmailExists(email);
-    if (isEmailExists) {
-      return res.status(400).json({
-        message: "Email is already registered",
-      });
-    }
-
-    await createNewUser({ uid, email, fullName });
-
-    res.status(201).json({
-      message: "User created successfully",
-      data: {
-        uid: uid,
-      },
+    res.status(200).json({
+      message: `User with uid ${uid} retrieved successfully`,
+      data: userData,
     });
   } catch (error) {
     res.status(500).json({
-      message: "Error registering user",
+      message: `Error retrieving user with uid ${uid}`,
       error: error.message,
     });
   }

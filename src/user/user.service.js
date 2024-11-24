@@ -18,8 +18,18 @@ const createNewUser = async (user) => {
   await createUser(user);
 };
 
+const getUserDataByUid = async (uid) => {
+  const userSnapshot = await getUserByUid(uid);
+  const userData = userSnapshot.data();
+  if (userData.created_at) {
+    userData.created_at = userData.created_at.toDate().toISOString();
+  }
+  return userData;
+};
+
 module.exports = {
   isUserUidExists,
   isUserEmailExists,
   createNewUser,
+  getUserDataByUid,
 };

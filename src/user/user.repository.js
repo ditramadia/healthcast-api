@@ -1,5 +1,4 @@
 const db = require("../db");
-const admin = require("../config/firebase-admin");
 
 const getUserByUid = async (uid) => {
   const userSnapshot = await db.collection("users").doc(uid).get();
@@ -19,7 +18,7 @@ const createUser = async (user) => {
   await db.collection("users").doc(uid).set({
     email,
     full_name: fullName,
-    created_at: admin.firestore.FieldValue.serverTimestamp(),
+    created_at: new Date(),
   });
 };
 
