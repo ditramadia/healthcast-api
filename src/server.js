@@ -1,6 +1,6 @@
 const express = require("express");
 const db = require("./db");
-const authController = require("./user/auth.controller");
+const authController = require("./auth/auth.controller");
 
 const app = express();
 app.use(express.json());
