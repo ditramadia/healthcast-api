@@ -22,8 +22,14 @@ const createUser = async (user) => {
   });
 };
 
+const updateUserByUid = async (uid, user) => {
+  const userRef = await db.collection("users").doc(uid);
+  await userRef.update(user);
+};
+
 module.exports = {
   getUserByUid,
   getUserByEmail,
   createUser,
+  updateUserByUid,
 };

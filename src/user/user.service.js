@@ -2,6 +2,7 @@ const {
   getUserByUid,
   getUserByEmail,
   createUser,
+  updateUserByUid,
 } = require("./user.repository");
 
 const isUserUidExists = async (uid) => {
@@ -18,7 +19,7 @@ const createNewUser = async (user) => {
   await createUser(user);
 };
 
-const getUserDataByUid = async (uid) => {
+const getUserData = async (uid) => {
   const userSnapshot = await getUserByUid(uid);
   const userData = userSnapshot.data();
   if (userData.created_at) {
@@ -27,9 +28,14 @@ const getUserDataByUid = async (uid) => {
   return userData;
 };
 
+const updateUserData = async (uid, newData) => {
+  await updateUserByUid(uid, newData);
+};
+
 module.exports = {
   isUserUidExists,
   isUserEmailExists,
   createNewUser,
-  getUserDataByUid,
+  getUserData,
+  updateUserData,
 };
