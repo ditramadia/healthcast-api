@@ -5,8 +5,7 @@ const userController = require("./user/user.controller");
 const app = express();
 app.use(express.json());
 
-const HOST = process.env.HOST;
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 5000;
 
 app.get("/", async (req, res) => {
   res.send("This is the API for HealthCast App");
@@ -15,6 +14,6 @@ app.get("/", async (req, res) => {
 app.use("", authController);
 app.use("/users", userController);
 
-app.listen(PORT, HOST, () => {
-  console.log(`Express API running in http://${HOST}:${PORT}`);
+app.listen(PORT, () => {
+  console.log(`Express API running in port ${PORT}`);
 });
