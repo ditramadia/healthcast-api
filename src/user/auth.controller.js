@@ -4,7 +4,7 @@ const {
   isUserUidExists,
   isUserEmailExists,
   createNewUser,
-} = require("./user.service");
+} = require("./auth.service");
 
 /**
  * REGISTER

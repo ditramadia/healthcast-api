@@ -2,7 +2,7 @@ const {
   getUserByUid,
   getUserByEmail,
   createUser,
-} = require("./user.repository");
+} = require("./auth.repository");
 
 const isUserUidExists = async (uid) => {
   const userSnapshot = await getUserByUid(uid);
