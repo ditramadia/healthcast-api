@@ -4,16 +4,15 @@ const {
   isUserUidExists,
   isUserEmailExists,
   createNewUser,
-} = require("./auth.service");
+} = require("../user/user.service");
 
 /**
  * REGISTER
  * POST /register
  */
 router.post("/register", async (req, res) => {
+  const { uid, email, fullName } = req.body;
   try {
-    const { uid, email, fullName } = req.body;
-
     if (!uid) {
       return res.status(400).json({
         message: "Missing required field: uid",
