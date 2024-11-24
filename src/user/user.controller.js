@@ -2,6 +2,10 @@ const express = require("express");
 const { isUserUidExists, getUserDataByUid } = require("./user.service");
 const router = express.Router();
 
+/**
+ * GET USER BY UID
+ * GET /users/:uid
+ */
 router.get("/:uid", async (req, res) => {
   const { uid } = req.params;
   try {
