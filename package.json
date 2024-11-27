@@ -4,8 +4,8 @@
   "description": "API for HealthCast",
   "main": "src/server.js",
   "scripts": {
-    "start": "node --env-file=.env ./src/server.js",
-    "dev": "nodemon --env-file=.env ./src/server.js"
+    "start": "node ./src/server.js",
+    "dev": "nodemon ./src/server.js"
   },
   "author": "",
   "license": "ISC",
