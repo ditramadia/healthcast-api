@@ -5,7 +5,7 @@ const userController = require("./user/user.controller");
 const app = express();
 app.use(express.json());
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 8080;
 
 app.get("/", async (req, res) => {
   res.send("This is the API for HealthCast App");
