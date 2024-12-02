@@ -47,18 +47,6 @@ const deletePostById = async (postId) => {
   await postRef.delete();
 };
 
-// const getPostComments = async (postId, page, limit) => {
-// 	const commentsSnapshot = await db
-// 		.collection("posts")
-// 		.doc(postId)
-// 		.collection("comments")
-// 		.orderBy("created_at", "desc")
-// 		.limit(limit)
-// 		.offset((page - 1) * limit)
-// 		.get();
-// 	return commentsSnapshot;
-// }
-
 // const getCommentById = async (postId, commentId) => {
 // 	const commentSnapshot = await db.collection("posts").doc(postId).collection("comments").doc(commentId).get();
 // 	return commentSnapshot;

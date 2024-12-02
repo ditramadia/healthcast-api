@@ -229,33 +229,6 @@ router.put("/:id/dislike", async (req, res) => {
   }
 });
 
-/*
-Get all comments
-GET /posts/:id/comments
-*/
-// router.get("/:id/comments", async (req, res) => {
-//   const { id } = req.params;
-//   const { page = 1, limit = 5 } = req.query;
-//   try {
-//     const isPostExists = await isPostIdExists(id);
-//     if (!isPostExists) {
-//       return res.status(404).json({
-//         message: `Post with id ${id} does not exists`,
-//       });
-//     }
-//     const comments = await getComments(id, page, limit);
-//     res.status(200).json({
-//       message: "Comments retrieved successfully",
-//       data: comments,
-//     });
-//   } catch (error) {
-//     res.status(500).json({
-//       message: "Error retrieving comments",
-//       error: error.message,
-//     });
-//   }
-// });
-
 // router.post("/:id/comments", async (req, res) => {
 //   const { id } = req.params;
 //   const { user, comment } = req.body;
