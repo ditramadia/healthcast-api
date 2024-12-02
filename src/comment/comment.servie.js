@@ -1,5 +1,8 @@
 const { getPostRefById } = require("../post/post.repository");
-const { getAllCommentsRef } = require("./comment.repository");
+const { getUserByUid } = require("../user/user.repository");
+const { getAllCommentsRef, createNewComment } = require("./comment.repository");
+
+// === READ SERVICES =======
 
 const getComments = async (postId, page, limit) => {
   const postRef = await getPostRefById(postId);
@@ -54,6 +57,23 @@ const getComments = async (postId, page, limit) => {
   return commentsData;
 };
 
+// === CREATE SERVICES =======
+
+const createComment = async (uid, postId, comment) => {
+  const userRef = await getUserByUid(uid);
+  const postRef = await getPostRefById(postId);
+
+  const newComment = {
+    comment,
+    user: userRef,
+    likes: [],
+    dislikes: [],
+    created_at: new Date(),
+  };
+  await createNewComment(postRef, newComment);
+};
+
 module.exports = {
   getComments,
+  createComment,
 };

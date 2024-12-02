@@ -1,3 +1,5 @@
+// === READ OPERATIONS =======
+
 const getAllCommentsRef = async (postRef, page, limit) => {
   const commentsRef = await postRef
     .collection("comments")
@@ -7,6 +9,13 @@ const getAllCommentsRef = async (postRef, page, limit) => {
   return commentsRef;
 };
 
+// === CREATE OPERATIONS =======
+
+const createNewComment = async (postRef, newComment) => {
+  await postRef.collection("comments").add(newComment);
+};
+
 module.exports = {
   getAllCommentsRef,
+  createNewComment,
 };

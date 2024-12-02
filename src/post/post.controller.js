@@ -47,17 +47,17 @@ router.post("/", async (req, res) => {
         message: "Missing required field: Uid",
       });
 
+    if (!title)
+      return res.status(400).json({
+        message: "Missing required field: Title",
+      });
+
     const isUserExists = await isUserUidExists(uid);
     if (!isUserExists) {
       return res.status(404).json({
         message: `User with uid ${uid} does not exist`,
       });
     }
-
-    if (!title)
-      return res.status(400).json({
-        message: "Missing required field: Title",
-      });
 
     await createPost({ uid, title, description, image_url });
     res.status(201).json({
@@ -252,10 +252,3 @@ router.put("/:id/dislike", async (req, res) => {
 // });
 
 module.exports = router;
-/*
-Like comment
-PUT /posts/:id/comments/:id/likes
-
-Dislike comment
-PUT /posts/:id/comments/:id/dislikes
-*/

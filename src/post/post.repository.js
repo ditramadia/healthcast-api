@@ -47,19 +47,6 @@ const deletePostById = async (postId) => {
   await postRef.delete();
 };
 
-// const getCommentById = async (postId, commentId) => {
-// 	const commentSnapshot = await db.collection("posts").doc(postId).collection("comments").doc(commentId).get();
-// 	return commentSnapshot;
-// }
-
-// const getPostsByUserId = async (userId) => {
-// 	const postsSnapshot = await db
-// 		.collection("posts")
-// 		.where("user_id", "==", userId)
-// 		.get();
-// 	return postsSnapshot;
-// }
-
 // const createNewComment = async (postId, commentMsg) => {
 // 	const { user, comment, likes, dislikes} = commentMsg;
 // 	const commentRef = await db.collection("posts").doc(postId).collection("comments").add({

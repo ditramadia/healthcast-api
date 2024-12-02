@@ -150,34 +150,6 @@ const dislikePost = async (postId, uid) => {
 //     await createNewComment(postId, comment);
 // }
 
-// const LikeToComment = async (postId, commentId) => {
-//     const commentSnapshot = await getCommentById(postId, commentId);
-//     const comment = commentSnapshot.data();
-//     comment.likes = comment.likes + 1;
-//     await updateCommentById(postId, commentId, comment);
-// }
-
-// const DislikeToComment = async (postId, commentId) => {
-//     const commentSnapshot = await getCommentById(postId, commentId);
-//     const comment = commentSnapshot.data();
-//     comment.dislikes = comment.dislikes + 1;
-//     await updateCommentById(postId, commentId, comment);
-// }
-
-// const removeLikeFromComment = async (postId, commentId) => {
-//     const commentSnapshot = await getCommentById(postId, commentId);
-//     const comment = commentSnapshot.data();
-//     comment.likes = comment.likes - 1;
-//     await updateCommentById(postId, commentId, comment);
-// }
-
-// const removeDislikeFromComment = async (postId, commentId) => {
-//     const commentSnapshot = await getCommentById(postId, commentId);
-//     const comment = commentSnapshot.data();
-//     comment.dislikes = comment.dislikes - 1;
-//     await updateCommentById(postId, commentId, comment);
-// }
-
 module.exports = {
   isPostIdExists,
   getPosts,
