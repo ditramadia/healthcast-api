@@ -39,22 +39,19 @@ const getPost = async (postId) => {
   const postSnapshot = await postRef.get();
   const postData = postSnapshot.data();
 
-  // Resolve the user reference to actual user data
   if (postData.user) {
     const userSnapshot = await postData.user.get();
     if (userSnapshot.exists) {
       _temp = userSnapshot.data();
-      console.log(_temp);
       postData.user = {
         id: userSnapshot.id,
-        fullName: _temp.fullName,
+        fullName: _temp.full_name,
       };
     } else {
       postData.user = null;
     }
   }
 
-  // Resolve the likes reference to acutal likes data
   if (postData.likes && Array.isArray(postData.likes)) {
     const likesSnapshots = await Promise.all(
       postData.likes.map((ref) => ref.get())
@@ -64,7 +61,6 @@ const getPost = async (postId) => {
       .map((snapshot) => snapshot.id);
   }
 
-  // Resolve the dislikes reference to acutal dislikes data
   if (postData.dislikes && Array.isArray(postData.dislikes)) {
     const dislikesSnapshot = await Promise.all(
       postData.dislikes.map((ref) => ref.get())
@@ -74,7 +70,6 @@ const getPost = async (postId) => {
       .map((snapshot) => snapshot.id);
   }
 
-  // Convert time stamp to ISO String
   if (postData.created_at) {
     postData.created_at = postData.created_at.toDate().toISOString();
   }
@@ -149,89 +144,6 @@ const dislikePost = async (postId, uid) => {
 
   await updatePostById(postId, postData);
 };
-
-// const getComments = async (postId, page, limit) => {
-//     const commentsSnapshot = await getPostComments(postId, page, limit);
-//     const commentsData = commentsSnapshot.docs.map((doc) => {
-//         const data = doc.data();
-//         if (data.created_at) {
-//             data.created_at = data.created_at.toDate().toISOString();
-//         }
-//         return { id: doc.id, ...data };
-//     });
-//     return commentsData;
-// }
-
-// const getLikes = async (postId) => {
-//     const likesSnapshot = await getPostLikes(postId);
-//     return likesSnapshot.data();
-// }
-
-// const getDislikes = async (postId) => {
-//     const dislikesSnapshot = await getPostDislikes(postId);
-//     return dislikesSnapshot.data();
-// }
-
-// const createComment = async (postId, comment) => {
-//     comment = {...comment, likes: 0, dislikes: 0};
-//     await createNewComment(postId, comment);
-// }
-
-// const LikeToPost = async (postId) => {
-//     const postSnapshot = await getPostById(postId);
-//     const post = postSnapshot.data();
-//     post.likes = post.likes + 1;
-//     await updatePostById(postId, post);
-// }
-
-// const DislikeToPost = async (postId) => {
-//     const postSnapshot = await getPostById(postId);
-//     const post = postSnapshot.data();
-//     post.dislikes = post.dislikes + 1;
-//     await updatePostById(postId, post);
-// }
-
-// const LikeToComment = async (postId, commentId) => {
-//     const commentSnapshot = await getCommentById(postId, commentId);
-//     const comment = commentSnapshot.data();
-//     comment.likes = comment.likes + 1;
-//     await updateCommentById(postId, commentId, comment);
-// }
-
-// const DislikeToComment = async (postId, commentId) => {
-//     const commentSnapshot = await getCommentById(postId, commentId);
-//     const comment = commentSnapshot.data();
-//     comment.dislikes = comment.dislikes + 1;
-//     await updateCommentById(postId, commentId, comment);
-// }
-
-// const removeLikeFromPost = async (postId) => {
-//     const postSnapshot = await getPostById(postId);
-//     const post = postSnapshot.data();
-//     post.likes = post.likes - 1;
-//     await updatePostById(postId, post);
-// }
-
-// const removeDislikeFromPost = async (postId) => {
-//     const postSnapshot = await getPostById(postId);
-//     const post = postSnapshot.data();
-//     post.dislikes = post.dislikes - 1;
-//     await updatePostById(postId, post);
-// }
-
-// const removeLikeFromComment = async (postId, commentId) => {
-//     const commentSnapshot = await getCommentById(postId, commentId);
-//     const comment = commentSnapshot.data();
-//     comment.likes = comment.likes - 1;
-//     await updateCommentById(postId, commentId, comment);
-// }
-
-// const removeDislikeFromComment = async (postId, commentId) => {
-//     const commentSnapshot = await getCommentById(postId, commentId);
-//     const comment = commentSnapshot.data();
-//     comment.dislikes = comment.dislikes - 1;
-//     await updateCommentById(postId, commentId, comment);
-// }
 
 module.exports = {
   isPostIdExists,
