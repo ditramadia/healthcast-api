@@ -2,19 +2,18 @@ const db = require("../db");
 
 // === READ OPERATIONS =======
 
-const getAllPosts = async (page, limit) => {
-  const postsSnapshot = await db
+const getAllPostsRef = async (page, limit) => {
+  const postsRef = await db
     .collection("posts")
     .orderBy("created_at", "desc")
     .limit(limit)
-    .offset((page - 1) * limit)
-    .get();
-  return postsSnapshot;
+    .offset((page - 1) * limit);
+  return postsRef;
 };
 
-const getPostById = async (postId) => {
-  const postSnapshot = await db.collection("posts").doc(postId).get();
-  return postSnapshot;
+const getPostRefById = async (postId) => {
+  const postRef = await db.collection("posts").doc(postId);
+  return postRef;
 };
 
 // === CREATE OPERATIONS =======
@@ -86,7 +85,7 @@ const createNewPost = async (post) => {
 // }
 
 module.exports = {
-  getAllPosts,
-  getPostById,
+  getAllPostsRef,
+  getPostRefById,
   createNewPost,
 };

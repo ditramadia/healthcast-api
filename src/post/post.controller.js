@@ -3,7 +3,7 @@ const {
   isPostIdExists,
   getPosts,
   getPost,
-  createNewPost,
+  createPost,
 } = require("./post.service");
 const { isUserUidExists } = require("../user/user.service");
 const router = express.Router();
@@ -13,7 +13,7 @@ const router = express.Router();
  * GET /posts
  */
 router.get("/", async (req, res) => {
-  const { page = 1, limit = 5 } = req.query;
+  const { page = 1, limit = 10 } = req.query;
 
   try {
     const posts = await getPosts(page, limit);
@@ -33,39 +33,39 @@ router.get("/", async (req, res) => {
  * CREATE NEW POST
  * POST /posts
  */
-// router.post("/", async (req, res) => {
-//   // TODO: Use Multer to upload image instead of inserting the image_url in the body
-//   const { uid, title, description, image_url } = req.body;
+router.post("/", async (req, res) => {
+  // TODO: Use Multer to upload image instead of inserting the image_url in the body
+  const { uid, title, description = "", image_url = "" } = req.body;
 
-//   try {
-//     if (!uid)
-//       return res.status(400).json({
-//         message: "Missing required field: User",
-//       });
+  try {
+    if (!uid)
+      return res.status(400).json({
+        message: "Missing required field: Uid",
+      });
 
-//     const isUserExists = await isUserUidExists(uid);
-//     if (!isUserExists) {
-//       return res.status(404).json({
-//         message: `User with uid ${uid} does not exist`,
-//       });
-//     }
+    const isUserExists = await isUserUidExists(uid);
+    if (!isUserExists) {
+      return res.status(404).json({
+        message: `User with uid ${uid} does not exist`,
+      });
+    }
 
-//     if (!title)
-//       return res.status(400).json({
-//         message: "Missing required field: Title",
-//       });
+    if (!title)
+      return res.status(400).json({
+        message: "Missing required field: Title",
+      });
 
-//     await createNewPost({ uid, title, description, image_url });
-//     res.status(201).json({
-//       message: "Post created successfully",
-//     });
-//   } catch (error) {
-//     res.status(500).json({
-//       message: "Error creating post",
-//       error: error.message,
-//     });
-//   }
-// });
+    await createPost({ uid, title, description, image_url });
+    res.status(201).json({
+      message: "Post created successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error creating post",
+      error: error.message,
+    });
+  }
+});
 
 /**
  * GET POST BY ID

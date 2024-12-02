@@ -1,17 +1,23 @@
-const { getAllPosts, getPostById } = require("./post.repository");
+const {
+  getAllPostsRef,
+  getPostRefById,
+  createNewPost,
+} = require("./post.repository");
 const { getUserRef } = require("../user/user.service");
 
 // === VALIDATION SERVICES =======
 
 const isPostIdExists = async (postId) => {
-  const postSnapshot = await getPostById(postId);
+  const postRef = await getPostRefById(postId);
+  const postSnapshot = await postRef.get();
   return postSnapshot.exists;
 };
 
 // === READ SERVICES =======
 
 const getPosts = async (page, limit) => {
-  const postsSnapshot = await getAllPosts(page, limit);
+  const postsRef = await getAllPostsRef(page, limit);
+  const postsSnapshot = await postsRef.get();
   const postsData = [];
 
   for (const postSnapshot of postsSnapshot.docs) {
@@ -27,7 +33,8 @@ const getPosts = async (page, limit) => {
 };
 
 const getPost = async (postId) => {
-  const postSnapshot = await getPostById(postId);
+  const postRef = await getPostRefById(postId);
+  const postSnapshot = await postRef.get();
   const postData = postSnapshot.data();
 
   // Resolve the user reference to actual user data
@@ -74,7 +81,7 @@ const getPost = async (postId) => {
 };
 
 // CREATE SERVICES =======
-const createNewPost = async (post) => {
+const createPost = async (post) => {
   const { uid } = post;
   const userRef = await getUserRef(uid);
   post.userRef = userRef;
@@ -177,5 +184,5 @@ module.exports = {
   isPostIdExists,
   getPosts,
   getPost,
-  createNewPost,
+  createPost,
 };
