@@ -104,6 +104,26 @@ const deletePost = async (postId) => {
   await deletePostById(postId);
 };
 
+// === ACTION SERVICES =======
+
+const likePost = async (postId, uid) => {
+  const userRef = await getUserRef(uid);
+
+  const postRef = await getPostRefById(postId);
+  const postSnapshot = await postRef.get();
+  const postData = postSnapshot.data();
+
+  const likes = postData.likes || [];
+  const userIndex = likes.findIndex((ref) => ref.path === userRef.path);
+  if (userIndex === -1) {
+    likes.push(userRef);
+  } else {
+    likes.splice(userIndex, 1);
+  }
+
+  await updatePostById(postId, postData);
+};
+
 // const getComments = async (postId, page, limit) => {
 //     const commentsSnapshot = await getPostComments(postId, page, limit);
 //     const commentsData = commentsSnapshot.docs.map((doc) => {
@@ -194,4 +214,5 @@ module.exports = {
   createPost,
   updatePost,
   deletePost,
+  likePost,
 };
