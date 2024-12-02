@@ -16,7 +16,7 @@ router.get("/:uid", async (req, res) => {
     const isUserExists = await isUserUidExists(uid);
     if (!isUserExists) {
       return res.status(404).json({
-        message: `User with uid ${uid} does not exists`,
+        message: `User with uid ${uid} does not exist`,
       });
     }
 
@@ -44,17 +44,15 @@ router.post("/:uid", async (req, res) => {
 
   try {
     const isUserExists = await isUserUidExists(uid);
-    if (!isUserExists) {
+    if (!isUserExists)
       return res.status(404).json({
-        message: `User with uid ${uid} does not exists`,
+        message: `User with uid ${uid} does not exist`,
       });
-    }
 
-    if (!fullName) {
+    if (!fullName)
       return res.status(400).json({
         message: "Missing required field: Full Name",
       });
-    }
 
     const updatedProfile = {
       fullName,

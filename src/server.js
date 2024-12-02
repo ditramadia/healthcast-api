@@ -4,6 +4,8 @@ dotenv.config();
 
 const authController = require("./auth/auth.controller");
 const userController = require("./user/user.controller");
+const postController = require("./post/post.controller");
+const commentController = require("./comment/comment.controller");
 
 const app = express();
 app.use(express.json());
@@ -16,6 +18,8 @@ app.get("/", async (req, res) => {
 
 app.use("", authController);
 app.use("/users", userController);
+app.use("/posts", postController);
+app.use("/posts/:postId/comments", commentController);
 
 app.listen(PORT, () => {
   console.log(`Express API running in port ${PORT}`);
