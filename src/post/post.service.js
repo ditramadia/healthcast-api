@@ -3,6 +3,7 @@ const {
   getPostRefById,
   createNewPost,
   updatePostById,
+  deletePostById,
 } = require("./post.repository");
 const { getUserRef } = require("../user/user.service");
 
@@ -97,6 +98,12 @@ const updatePost = async (postId, post) => {
   await updatePostById(postId, post);
 };
 
+// === DELETE SERVICES =======
+
+const deletePost = async (postId) => {
+  await deletePostById(postId);
+};
+
 // const getComments = async (postId, page, limit) => {
 //     const commentsSnapshot = await getPostComments(postId, page, limit);
 //     const commentsData = commentsSnapshot.docs.map((doc) => {
@@ -122,10 +129,6 @@ const updatePost = async (postId, post) => {
 // const createComment = async (postId, comment) => {
 //     comment = {...comment, likes: 0, dislikes: 0};
 //     await createNewComment(postId, comment);
-// }
-
-// const deletePost = async (postId) => {
-//     await deletePostById(postId);
 // }
 
 // const LikeToPost = async (postId) => {
@@ -190,4 +193,5 @@ module.exports = {
   getPost,
   createPost,
   updatePost,
+  deletePost,
 };

@@ -5,6 +5,7 @@ const {
   getPost,
   createPost,
   updatePost,
+  deletePost,
 } = require("./post.service");
 const { isUserUidExists } = require("../user/user.service");
 const router = express.Router();
@@ -98,7 +99,7 @@ router.get("/:id", async (req, res) => {
 
 /**
  * EDIT POST BY ID
- * PUT /posts/"id"
+ * PUT /posts/:id
  */
 router.put("/:id", async (req, res) => {
   const { id } = req.params;
@@ -126,30 +127,34 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-/*
-Delete Post by id
-DELETE /posts/:id
-*/
-// router.delete("/:id", async (req, res) => {
-//   const { id } = req.params;
-//   try {
-//     const isPostExists = await isPostIdExists(id);
-//     if (!isPostExists) {
-//       return res.status(404).json({
-//         message: `Post with id ${id} does not exists`,
-//       });
-//     }
-//     await deletePost(id);
-//     res.status(200).json({
-//       message: "Post deleted successfully",
-//     });
-//   } catch (error) {
-//     res.status(500).json({
-//       message: "Error deleting post",
-//       error: error.message,
-//     });
-//   }
-// });
+/**
+ * DELETE POST BY ID
+ * DELETE /posts/:id
+ */
+router.delete("/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const isPostExists = await isPostIdExists(id);
+    if (!isPostExists) {
+      return res.status(404).json({
+        message: `Post with id ${id} does not exist`,
+      });
+    }
+
+    await deletePost(id);
+
+    res.status(200).json({
+      message: "Post deleted successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error deleting post",
+      error: error.message,
+    });
+  }
+});
+
 /*
 Like post
 PUT /posts/:id/likes

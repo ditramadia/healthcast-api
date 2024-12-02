@@ -40,6 +40,13 @@ const updatePostById = async (postId, post) => {
   await postRef.update(post);
 };
 
+// === DELETE OPERATIONS =======
+
+const deletePostById = async (postId) => {
+  const postRef = await db.collection("posts").doc(postId);
+  await postRef.delete();
+};
+
 // const getPostComments = async (postId, page, limit) => {
 // 	const commentsSnapshot = await db
 // 		.collection("posts")
@@ -81,14 +88,10 @@ const updatePostById = async (postId, post) => {
 // 	await commentRef.update(comment);
 // }
 
-// const deletePostById = async (postId) => {
-// 	const postRef = await db.collection("posts").doc(postId);
-// 	await postRef.delete();
-// }
-
 module.exports = {
   getAllPostsRef,
   getPostRefById,
   createNewPost,
   updatePostById,
+  deletePostById,
 };
