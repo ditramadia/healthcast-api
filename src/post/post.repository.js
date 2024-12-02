@@ -33,6 +33,13 @@ const createNewPost = async (post) => {
   postRef.collection("comments");
 };
 
+// === UPDATE OPERATIONS =======
+
+const updatePostById = async (postId, post) => {
+  const postRef = await db.collection("posts").doc(postId);
+  await postRef.update(post);
+};
+
 // const getPostComments = async (postId, page, limit) => {
 // 	const commentsSnapshot = await db
 // 		.collection("posts")
@@ -69,11 +76,6 @@ const createNewPost = async (post) => {
 // 	});
 // }
 
-// const updatePostById = async (postId, post) => {
-// 	const postRef = await db.collection("posts").doc(postId);
-// 	await postRef.update(post);
-// }
-
 // const updateCommentById = async (postId, commentId, comment) => {
 // 	const commentRef = await db.collection("posts").doc(postId).collection("comments").doc(commentId);
 // 	await commentRef.update(comment);
@@ -88,4 +90,5 @@ module.exports = {
   getAllPostsRef,
   getPostRefById,
   createNewPost,
+  updatePostById,
 };

@@ -4,6 +4,7 @@ const {
   getPosts,
   getPost,
   createPost,
+  updatePost,
 } = require("./post.service");
 const { isUserUidExists } = require("../user/user.service");
 const router = express.Router();
@@ -95,31 +96,36 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-/*
-Edit Post by id
-PUT /posts/:id
-*/
-// router.put("/:id", async (req, res) => {
-//   const { id } = req.params;
-//   const { title, description, image_url } = req.body;
-//   try {
-//     const isPostExists = await isPostIdExists(id);
-//     if (!isPostExists) {
-//       return res.status(404).json({
-//         message: `Post with id ${id} does not exists`,
-//       });
-//     }
-//     await updatePost(id, { title, description, image_url });
-//     res.status(200).json({
-//       message: "Post updated successfully",
-//     });
-//   } catch (error) {
-//     res.status(500).json({
-//       message: "Error updating post",
-//       error: error.message,
-//     });
-//   }
-// });
+/**
+ * EDIT POST BY ID
+ * PUT /posts/"id"
+ */
+router.put("/:id", async (req, res) => {
+  const { id } = req.params;
+  // TODO: Use Multer to upload image instead of inserting the image_url in the body
+  const { title, description = "", image_url = "" } = req.body;
+
+  try {
+    const isPostExists = await isPostIdExists(id);
+    if (!isPostExists) {
+      return res.status(404).json({
+        message: `Post with id ${id} does not exist`,
+      });
+    }
+
+    await updatePost(id, { title, description, image_url });
+
+    res.status(200).json({
+      message: "Post updated successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error updating post",
+      error: error.message,
+    });
+  }
+});
+
 /*
 Delete Post by id
 DELETE /posts/:id

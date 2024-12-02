@@ -2,6 +2,7 @@ const {
   getAllPostsRef,
   getPostRefById,
   createNewPost,
+  updatePostById,
 } = require("./post.repository");
 const { getUserRef } = require("../user/user.service");
 
@@ -80,13 +81,20 @@ const getPost = async (postId) => {
   return postData;
 };
 
-// CREATE SERVICES =======
+// === CREATE SERVICES =======
+
 const createPost = async (post) => {
   const { uid } = post;
   const userRef = await getUserRef(uid);
   post.userRef = userRef;
 
   await createNewPost(post);
+};
+
+// === UPDATE SERVICES =======
+
+const updatePost = async (postId, post) => {
+  await updatePostById(postId, post);
 };
 
 // const getComments = async (postId, page, limit) => {
@@ -114,10 +122,6 @@ const createPost = async (post) => {
 // const createComment = async (postId, comment) => {
 //     comment = {...comment, likes: 0, dislikes: 0};
 //     await createNewComment(postId, comment);
-// }
-
-// const updatePost = async (postId, post) => {
-//     await updatePostById(postId, post);
 // }
 
 // const deletePost = async (postId) => {
@@ -185,4 +189,5 @@ module.exports = {
   getPosts,
   getPost,
   createPost,
+  updatePost,
 };
