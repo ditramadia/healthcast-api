@@ -1,5 +1,11 @@
 const express = require("express");
-const { isPostIdExists, getPosts, getPost } = require("./post.service");
+const {
+  isPostIdExists,
+  getPosts,
+  getPost,
+  createNewPost,
+} = require("./post.service");
+const { isUserUidExists } = require("../user/user.service");
 const router = express.Router();
 
 /**
@@ -22,21 +28,34 @@ router.get("/", async (req, res) => {
     });
   }
 });
-/*
 
-Create new post
-POST /posts
-*/
+/**
+ * CREATE NEW POST
+ * POST /posts
+ */
 // router.post("/", async (req, res) => {
-//   const { user, title, description, image_url } = req.body;
+//   // TODO: Use Multer to upload image instead of inserting the image_url in the body
+//   const { uid, title, description, image_url } = req.body;
+
 //   try {
-//     const isUserExists = await isUserUidExists(user);
+//     if (!uid)
+//       return res.status(400).json({
+//         message: "Missing required field: User",
+//       });
+
+//     const isUserExists = await isUserUidExists(uid);
 //     if (!isUserExists) {
 //       return res.status(404).json({
-//         message: `User with uid ${user} does not exists`,
+//         message: `User with uid ${uid} does not exist`,
 //       });
 //     }
-//     await createPost({ user, title, description, image_url });
+
+//     if (!title)
+//       return res.status(400).json({
+//         message: "Missing required field: Title",
+//       });
+
+//     await createNewPost({ uid, title, description, image_url });
 //     res.status(201).json({
 //       message: "Post created successfully",
 //     });

@@ -1,4 +1,5 @@
 const { getAllPosts, getPostById } = require("./post.repository");
+const { getUserRef } = require("../user/user.service");
 
 // === VALIDATION SERVICES =======
 
@@ -72,6 +73,15 @@ const getPost = async (postId) => {
   return postData;
 };
 
+// CREATE SERVICES =======
+const createNewPost = async (post) => {
+  const { uid } = post;
+  const userRef = await getUserRef(uid);
+  post.userRef = userRef;
+
+  await createNewPost(post);
+};
+
 // const getComments = async (postId, page, limit) => {
 //     const commentsSnapshot = await getPostComments(postId, page, limit);
 //     const commentsData = commentsSnapshot.docs.map((doc) => {
@@ -92,12 +102,6 @@ const getPost = async (postId) => {
 // const getDislikes = async (postId) => {
 //     const dislikesSnapshot = await getPostDislikes(postId);
 //     return dislikesSnapshot.data();
-// }
-
-// const createPost = async (post) => {
-//     // add like and dislike 0 to post
-//     post = {...post, likes: 0, dislikes: 0};
-//     await createNewPost(post);
 // }
 
 // const createComment = async (postId, comment) => {
@@ -173,4 +177,5 @@ module.exports = {
   isPostIdExists,
   getPosts,
   getPost,
+  createNewPost,
 };

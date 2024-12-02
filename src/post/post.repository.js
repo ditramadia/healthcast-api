@@ -17,6 +17,23 @@ const getPostById = async (postId) => {
   return postSnapshot;
 };
 
+// === CREATE OPERATIONS =======
+
+const createNewPost = async (post) => {
+  const { userRef, title, description, image_url } = post;
+  const postRef = await db.collection("posts").add({
+    user: userRef,
+    image_url,
+    title,
+    description,
+    likes: [],
+    dislikes: [],
+    created_at: new Date(),
+  });
+
+  postRef.collection("comments");
+};
+
 // const getPostComments = async (postId, page, limit) => {
 // 	const commentsSnapshot = await db
 // 		.collection("posts")
@@ -40,21 +57,6 @@ const getPostById = async (postId) => {
 // 		.where("user_id", "==", userId)
 // 		.get();
 // 	return postsSnapshot;
-// }
-
-// const createNewPost = async (post) => {
-//   const { user, title, description, image_url , likes, dislikes} = post;
-//   const postRef = await db.collection("posts").add({
-//     user,
-//     image_url,
-//     title,
-//     description,
-//     likes,
-//     dislikes,
-//     created_at: new Date(),
-//   });
-
-//   postRef.collection("comments");
 // }
 
 // const createNewComment = async (postId, commentMsg) => {
@@ -86,4 +88,5 @@ const getPostById = async (postId) => {
 module.exports = {
   getAllPosts,
   getPostById,
+  createNewPost,
 };
