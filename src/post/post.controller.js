@@ -1,5 +1,5 @@
 const express = require("express");
-const { getPosts } = require("./post.service");
+const { isPostIdExists, getPosts, getPost } = require("./post.service");
 const router = express.Router();
 
 /**
@@ -47,31 +47,35 @@ POST /posts
 //     });
 //   }
 // });
-/*
-Get post by id
-GET /posts/:id
-*/
-// router.get("/:id", async (req, res) => {
-//   const { id } = req.params;
-//   try {
-//     const isPostExists = await isPostIdExists(id);
-//     if (!isPostExists) {
-//       return res.status(404).json({
-//         message: `Post with id ${id} does not exists`,
-//       });
-//     }
-//     const post = await getPost(id);
-//     res.status(200).json({
-//       message: "Post retrieved successfully",
-//       data: post,
-//     });
-//   } catch (error) {
-//     res.status(500).json({
-//       message: "Error retrieving post",
-//       error: error.message,
-//     });
-//   }
-// });
+
+/**
+ * GET POST BY ID
+ * GET /posts/:id
+ */
+router.get("/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const isPostExists = await isPostIdExists(id);
+    if (!isPostExists) {
+      return res.status(404).json({
+        message: `Post with id ${id} does not exist`,
+      });
+    }
+
+    const post = await getPost(id);
+    res.status(200).json({
+      message: "Post retrieved successfully",
+      data: post,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error retrieving post",
+      error: error.message,
+    });
+  }
+});
+
 /*
 Edit Post by id
 PUT /posts/:id

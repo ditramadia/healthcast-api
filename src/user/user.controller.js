@@ -16,7 +16,7 @@ router.get("/:uid", async (req, res) => {
     const isUserExists = await isUserUidExists(uid);
     if (!isUserExists) {
       return res.status(404).json({
-        message: `User with uid ${uid} does not exists`,
+        message: `User with uid ${uid} does not exist`,
       });
     }
 
@@ -46,7 +46,7 @@ router.post("/:uid", async (req, res) => {
     const isUserExists = await isUserUidExists(uid);
     if (!isUserExists) {
       return res.status(404).json({
-        message: `User with uid ${uid} does not exists`,
+        message: `User with uid ${uid} does not exist`,
       });
     }
 

@@ -1,5 +1,7 @@
 const db = require("../db");
 
+// === READ OPERATIONS =======
+
 const getAllPosts = async (page, limit) => {
   const postsSnapshot = await db
     .collection("posts")
@@ -10,10 +12,10 @@ const getAllPosts = async (page, limit) => {
   return postsSnapshot;
 };
 
-// const getPostById = async (postId) => {
-//   const postSnapshot = await db.collection("posts").doc(postId).get();
-//   return postSnapshot;
-// }
+const getPostById = async (postId) => {
+  const postSnapshot = await db.collection("posts").doc(postId).get();
+  return postSnapshot;
+};
 
 // const getPostComments = async (postId, page, limit) => {
 // 	const commentsSnapshot = await db
@@ -83,4 +85,5 @@ const getAllPosts = async (page, limit) => {
 
 module.exports = {
   getAllPosts,
+  getPostById,
 };
