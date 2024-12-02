@@ -7,6 +7,7 @@ const {
   updatePost,
   deletePost,
   likePost,
+  dislikePost,
 } = require("./post.service");
 const { isUserUidExists } = require("../user/user.service");
 const router = express.Router();
@@ -192,10 +193,43 @@ router.put("/:id/like", async (req, res) => {
   }
 });
 
-/*
-Dislike post
-PUT /posts/:id/dislikes
+/**
+ * DISLIKE/UNDISLIKE POST
+ * PUT /posts/:id/dislike
+ */
+router.put("/:id/dislike", async (req, res) => {
+  const { id: postId } = req.params;
+  const { uid } = req.body;
 
+  try {
+    const isPostExists = await isPostIdExists(postId);
+    if (!isPostExists) {
+      return res.status(404).json({
+        message: `Post with id ${postId} does not exist`,
+      });
+    }
+
+    const isUserExists = await isUserUidExists(uid);
+    if (!isUserExists) {
+      return res.status(404).json({
+        message: `User with uid ${uid} does not exist`,
+      });
+    }
+
+    await dislikePost(postId, uid);
+
+    res.status(200).json({
+      message: "Post liked/unliked successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error liking/unliking post",
+      error: error.message,
+    });
+  }
+});
+
+/*
 Get all comments
 GET /posts/:id/comments
 */

@@ -116,9 +116,35 @@ const likePost = async (postId, uid) => {
   const likes = postData.likes || [];
   const userIndex = likes.findIndex((ref) => ref.path === userRef.path);
   if (userIndex === -1) {
+    const dislikes = postData.dislikes || [];
+    const userIndex = dislikes.findIndex((ref) => ref.path === userRef.path);
+    if (userIndex !== -1) dislikes.splice(userIndex, 1);
+
     likes.push(userRef);
   } else {
     likes.splice(userIndex, 1);
+  }
+
+  await updatePostById(postId, postData);
+};
+
+const dislikePost = async (postId, uid) => {
+  const userRef = await getUserRef(uid);
+
+  const postRef = await getPostRefById(postId);
+  const postSnapshot = await postRef.get();
+  const postData = postSnapshot.data();
+
+  const dislikes = postData.dislikes || [];
+  const userIndex = dislikes.findIndex((ref) => ref.path === userRef.path);
+  if (userIndex === -1) {
+    const likes = postData.likes || [];
+    const userIndex = likes.findIndex((ref) => ref.path === userRef.path);
+    if (userIndex !== -1) likes.splice(userIndex, 1);
+
+    dislikes.push(userRef);
+  } else {
+    dislikes.splice(userIndex, 1);
   }
 
   await updatePostById(postId, postData);
@@ -215,4 +241,5 @@ module.exports = {
   updatePost,
   deletePost,
   likePost,
+  dislikePost,
 };
