@@ -5,28 +5,42 @@ const {
   updateUserByUid,
 } = require("./user.repository");
 
+// === VALIDATION SERVICES =======
+
 const isUserUidExists = async (uid) => {
-  const userSnapshot = await getUserByUid(uid);
+  const userRef = await getUserByUid(uid);
+  const userSnapshot = await userRef.get();
   return userSnapshot.exists;
 };
 
 const isUserEmailExists = async (email) => {
-  const userSnapshot = await getUserByEmail(email);
-  return !userSnapshot.empty;
+  const userRef = await getUserByEmail(email);
+  const userSnapshot = await userRef.get();
+  return userSnapshot.exists;
 };
 
-const createNewUser = async (user) => {
-  await createUser(user);
+// === READ SERVICES =======
+
+const getUserRef = async (uid) => {
+  const userRef = await getUserByUid(uid);
+  return userRef;
 };
 
 const getUserData = async (uid) => {
-  const userSnapshot = await getUserByUid(uid);
-  const userData = userSnapshot.data();
+  const userData = (await (await getUserByUid(uid)).get()).data();
   if (userData.created_at) {
     userData.created_at = userData.created_at.toDate().toISOString();
   }
   return userData;
 };
+
+// === CREATE SERVICES =======
+
+const createNewUser = async (user) => {
+  await createUser(user);
+};
+
+// === UPDATE SERVICES =======
 
 const updateUserData = async (uid, newData) => {
   await updateUserByUid(uid, newData);
@@ -35,6 +49,7 @@ const updateUserData = async (uid, newData) => {
 module.exports = {
   isUserUidExists,
   isUserEmailExists,
+  getUserRef,
   createNewUser,
   getUserData,
   updateUserData,
