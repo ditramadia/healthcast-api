@@ -47,22 +47,6 @@ const deletePostById = async (postId) => {
   await postRef.delete();
 };
 
-// const createNewComment = async (postId, commentMsg) => {
-// 	const { user, comment, likes, dislikes} = commentMsg;
-// 	const commentRef = await db.collection("posts").doc(postId).collection("comments").add({
-// 		user,
-// 		comment,
-// 		likes,
-// 		dislikes,
-// 		created_at: new Date(),
-// 	});
-// }
-
-// const updateCommentById = async (postId, commentId, comment) => {
-// 	const commentRef = await db.collection("posts").doc(postId).collection("comments").doc(commentId);
-// 	await commentRef.update(comment);
-// }
-
 module.exports = {
   getAllPostsRef,
   getPostRefById,

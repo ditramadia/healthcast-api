@@ -229,26 +229,4 @@ router.put("/:id/dislike", async (req, res) => {
   }
 });
 
-// router.post("/:id/comments", async (req, res) => {
-//   const { id } = req.params;
-//   const { user, comment } = req.body;
-//   try {
-//     const isPostExists = await isPostIdExists(id);
-//     if (!isPostExists) {
-//       return res.status(404).json({
-//         message: `Post with id ${id} does not exists`,
-//       });
-//     }
-//     await createComment(id, { user, comment });
-//     res.status(201).json({
-//       message: "Comment created successfully",
-//     });
-//   } catch (error) {
-//     res.status(500).json({
-//       message: "Error creating comment",
-//       error: error.message,
-//     });
-//   }
-// });
-
 module.exports = router;

@@ -9,13 +9,27 @@ const getAllCommentsRef = async (postRef, page, limit) => {
   return commentsRef;
 };
 
+const getCommentRefById = async (postRef, commentId) => {
+  const commentRef = await postRef.collection("comments").doc(commentId);
+  return commentRef;
+};
+
 // === CREATE OPERATIONS =======
 
 const createNewComment = async (postRef, newComment) => {
   await postRef.collection("comments").add(newComment);
 };
 
+// === UPDATE OPERATIONS =======
+
+const updateCommentById = async (postRef, commentId, newComment) => {
+  const commentRef = await postRef.collection("comments").doc(commentId);
+  await commentRef.update(newComment);
+};
+
 module.exports = {
   getAllCommentsRef,
+  getCommentRefById,
   createNewComment,
+  updateCommentById,
 };

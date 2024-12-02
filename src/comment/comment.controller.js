@@ -1,12 +1,18 @@
 const express = require("express");
 const { isUserUidExists } = require("../user/user.service");
 const { isPostIdExists } = require("../post/post.service");
-const { getComments, createComment } = require("../comment/comment.servie");
+const {
+  isCommentIdExists,
+  getComments,
+  createComment,
+  likeComment,
+  dislikeComment,
+} = require("../comment/comment.servie");
 const router = express.Router({ mergeParams: true });
 
 /**
  * GET ALL COMMENTS
- * GET /post/:id/comments
+ * GET /post/:postId/comments
  */
 router.get("/", async (req, res) => {
   const { postId } = req.params;
@@ -36,7 +42,7 @@ router.get("/", async (req, res) => {
 
 /**
  * CREATE NEW COMMENT
- * POST /post/:id/comments
+ * POST /post/:postId/comments
  */
 router.post("/", async (req, res) => {
   const { postId } = req.params;
@@ -60,11 +66,10 @@ router.post("/", async (req, res) => {
       });
 
     const isUserExists = await isUserUidExists(uid);
-    if (!isUserExists) {
+    if (!isUserExists)
       return res.status(404).json({
         message: `User with uid ${uid} does not exist`,
       });
-    }
 
     await createComment(uid, postId, comment);
 
@@ -74,6 +79,96 @@ router.post("/", async (req, res) => {
   } catch (error) {
     res.status(500).json({
       message: "Error creating comments",
+      error: error.message,
+    });
+  }
+});
+
+/**
+ * LIKE/UNLIKE COMMENT
+ * PUT /post/:postId/comments/:commentId/like
+ */
+router.put("/:commentId/like", async (req, res) => {
+  const { postId, commentId } = req.params;
+  const { uid } = req.body;
+
+  try {
+    if (!uid)
+      return res.status(400).json({
+        message: "Missing required field: Uid",
+      });
+
+    const isPostExists = await isPostIdExists(postId);
+    if (!isPostExists)
+      return res.status(404).json({
+        message: `Post with id ${postId} does not exist`,
+      });
+
+    const isCommentExists = await isCommentIdExists(postId, commentId);
+    if (!isCommentExists)
+      return res.status(404).json({
+        message: `Post with id ${postId} does not exist`,
+      });
+
+    const isUserExists = await isUserUidExists(uid);
+    if (!isUserExists)
+      return res.status(404).json({
+        message: `User with uid ${uid} does not exist`,
+      });
+
+    await likeComment(postId, commentId, uid);
+
+    res.status(200).json({
+      message: "Comments liked/unliked successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error liking/unliking comments",
+      error: error.message,
+    });
+  }
+});
+
+/**
+ * DISLIKE/UNDISLIKE COMMENT
+ * PUT /post/:postId/comments/:commentId/dislike
+ */
+router.put("/:commentId/dislike", async (req, res) => {
+  const { postId, commentId } = req.params;
+  const { uid } = req.body;
+
+  try {
+    if (!uid)
+      return res.status(400).json({
+        message: "Missing required field: Uid",
+      });
+
+    const isPostExists = await isPostIdExists(postId);
+    if (!isPostExists)
+      return res.status(404).json({
+        message: `Post with id ${postId} does not exist`,
+      });
+
+    const isCommentExists = await isCommentIdExists(postId, commentId);
+    if (!isCommentExists)
+      return res.status(404).json({
+        message: `Post with id ${postId} does not exist`,
+      });
+
+    const isUserExists = await isUserUidExists(uid);
+    if (!isUserExists)
+      return res.status(404).json({
+        message: `User with uid ${uid} does not exist`,
+      });
+
+    await dislikeComment(postId, commentId, uid);
+
+    res.status(200).json({
+      message: "Comments disliked/undisliked successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error disliking/undisliking comments",
       error: error.message,
     });
   }

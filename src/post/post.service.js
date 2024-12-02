@@ -145,11 +145,6 @@ const dislikePost = async (postId, uid) => {
   await updatePostById(postId, postData);
 };
 
-// const createComment = async (postId, comment) => {
-//     comment = {...comment, likes: 0, dislikes: 0};
-//     await createNewComment(postId, comment);
-// }
-
 module.exports = {
   isPostIdExists,
   getPosts,

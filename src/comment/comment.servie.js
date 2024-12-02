@@ -1,6 +1,21 @@
 const { getPostRefById } = require("../post/post.repository");
-const { getUserByUid } = require("../user/user.repository");
-const { getAllCommentsRef, createNewComment } = require("./comment.repository");
+const { getUserRef } = require("../user/user.service");
+const {
+  getAllCommentsRef,
+  getCommentRefById,
+  createNewComment,
+  updateCommentById,
+} = require("./comment.repository");
+
+// === VALIDATION SERVICES =======
+
+const isCommentIdExists = async (postId, commentId) => {
+  const postRef = await getPostRefById(postId);
+
+  const commentRef = await getCommentRefById(postRef, commentId);
+  const commentSnapshot = await commentRef.get();
+  return commentSnapshot.exists;
+};
 
 // === READ SERVICES =======
 
@@ -60,7 +75,7 @@ const getComments = async (postId, page, limit) => {
 // === CREATE SERVICES =======
 
 const createComment = async (uid, postId, comment) => {
-  const userRef = await getUserByUid(uid);
+  const userRef = await getUserRef(uid);
   const postRef = await getPostRefById(postId);
 
   const newComment = {
@@ -73,7 +88,58 @@ const createComment = async (uid, postId, comment) => {
   await createNewComment(postRef, newComment);
 };
 
+// === ACTION SERVICES =======
+
+const likeComment = async (postId, commentId, uid) => {
+  const userRef = await getUserRef(uid);
+  const postRef = await getPostRefById(postId);
+
+  const commentRef = await getCommentRefById(postRef, commentId);
+  const commentSnapshot = await commentRef.get();
+  const commentData = commentSnapshot.data();
+
+  const likes = commentData.likes || [];
+  const userIndex = likes.findIndex((ref) => ref.path === userRef.path);
+  if (userIndex === -1) {
+    const dislikes = commentData.dislikes || [];
+    const userIndex = dislikes.findIndex((ref) => ref.path === userRef.path);
+    if (userIndex !== -1) dislikes.splice(userIndex, 1);
+
+    likes.push(userRef);
+  } else {
+    likes.splice(userIndex, 1);
+  }
+
+  await updateCommentById(postRef, commentId, commentData);
+};
+
+const dislikeComment = async (postId, commentId, uid) => {
+  const userRef = await getUserRef(uid);
+  const postRef = await getPostRefById(postId);
+
+  const commentRef = await getCommentRefById(postRef, commentId);
+  const commentSnapshot = await commentRef.get();
+  const commentData = commentSnapshot.data();
+
+  const dislikes = commentData.dislikes || [];
+  const userIndex = dislikes.findIndex((ref) => ref.path === userRef.path);
+  if (userIndex === -1) {
+    const likes = commentData.likes || [];
+    const userIndex = likes.findIndex((ref) => ref.path === userRef.path);
+    if (userIndex !== -1) likes.splice(userIndex, 1);
+
+    dislikes.push(userRef);
+  } else {
+    dislikes.splice(userIndex, 1);
+  }
+
+  await updateCommentById(postRef, commentId, commentData);
+};
+
 module.exports = {
+  isCommentIdExists,
   getComments,
   createComment,
+  likeComment,
+  dislikeComment,
 };
