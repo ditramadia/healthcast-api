@@ -1,3 +1,6 @@
+const uploadImage = require("../utils/uploadImage");
+const deleteImage = require("../utils/deleteImage");
+
 const {
   getUserByUid,
   getUserByEmail,
@@ -42,7 +45,26 @@ const createNewUser = async (user) => {
 
 // === UPDATE SERVICES =======
 
-const updateUserData = async (uid, newData) => {
+const updateUserData = async (uid, data) => {
+  let avatar_url = "";
+  if (data.avatar) {
+    const currentUser = await getUserData(uid);
+    const oldAvatarUrl = currentUser?.avatar_url;
+
+    if (oldAvatarUrl) {
+      await deleteImage(oldAvatarUrl);
+    }
+
+    avatar_url = await uploadImage(data.avatar);
+  }
+
+  const newData = {
+    fullName: data.fullName,
+    gender: data.gender,
+    age: data.age,
+    avatar_url,
+  };
+
   await updateUserByUid(uid, newData);
 };
 

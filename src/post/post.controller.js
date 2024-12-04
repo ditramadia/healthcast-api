@@ -1,7 +1,6 @@
 const express = require("express");
 const upload = require("../middleware/multer");
-const uploadImage = require("../utils/uploadImage");
-const deleteImage = require("../utils/deleteImage");
+
 const {
   isPostIdExists,
   getPosts,
@@ -76,9 +75,7 @@ router.post("/", upload.single("image"), async (req, res) => {
       });
     }
 
-    const image_url = await uploadImage(image);
-
-    await createPost({ uid, title, description, image_url });
+    await createPost({ uid, title, description, image });
 
     res.status(201).json({
       message: "Post created successfully",
@@ -149,21 +146,7 @@ router.put("/:id", upload.single("image"), async (req, res) => {
       });
     }
 
-    let image_url = "";
-    if (image) {
-      let currentPost = await getPostRefById(id);
-      currentPost = await currentPost.get();
-      currentPost = await currentPost.data();
-      const oldImageUrl = currentPost?.image_url;
-
-      if (oldImageUrl) {
-        await deleteImage(oldImageUrl);
-      }
-
-      image_url = await uploadImage(image);
-    }
-
-    await updatePost(id, { title, description, image_url });
+    await updatePost(id, { title, description, image });
 
     res.status(200).json({
       message: "Post updated successfully",
@@ -189,15 +172,6 @@ router.delete("/:id", async (req, res) => {
       return res.status(404).json({
         message: `Post with id ${id} does not exist`,
       });
-    }
-
-    let currentPost = await getPostRefById(id);
-    currentPost = await currentPost.get();
-    currentPost = await currentPost.data();
-    const oldImageUrl = currentPost?.image_url;
-
-    if (oldImageUrl) {
-      await deleteImage(oldImageUrl);
     }
 
     await deletePost(id);

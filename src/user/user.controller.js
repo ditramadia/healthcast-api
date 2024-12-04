@@ -1,7 +1,5 @@
 const express = require("express");
 const upload = require("../middleware/multer");
-const uploadImage = require("../utils/uploadImage");
-const deleteImage = require("../utils/deleteImage");
 
 const {
   isUserUidExists,
@@ -73,24 +71,12 @@ router.post("/:uid", upload.single("avatar"), async (req, res) => {
         message: `User with uid ${uid} does not exist`,
       });
 
-    let avatar_url = "";
-    if (avatar) {
-      const currentUser = await getUserData(uid);
-      const oldAvatarUrl = currentUser?.avatar_url;
-
-      if (oldAvatarUrl) {
-        await deleteImage(oldAvatarUrl);
-      }
-
-      avatar_url = await uploadImage(avatar);
-    }
-
     const updatedProfile = {
       fullName,
     };
     if (gender) updatedProfile.gender = gender;
     if (age) updatedProfile.age = age;
-    if (avatar) updatedProfile.avatar_url = avatar_url;
+    if (avatar) updatedProfile.avatar = avatar;
 
     await updateUserData(uid, updatedProfile);
 
