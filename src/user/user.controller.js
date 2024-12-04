@@ -46,10 +46,6 @@ router.post("/:uid", upload.single("avatar"), async (req, res) => {
   const { fullName, gender, age } = req.body;
   const avatar = req.file;
 
-  console.log("param", req.params);
-  console.log("body:", req.body);
-  console.log("file", req.file);
-
   try {
     const isUserExists = await isUserUidExists(uid);
     if (!isUserExists)
@@ -61,6 +57,19 @@ router.post("/:uid", upload.single("avatar"), async (req, res) => {
       return res.status(400).json({
         message: "Missing required field: Full Name",
       });
+
+    if (avatar && avatar.size > 1 * 1024 * 1024) {
+      return res.status(400).json({
+        message: "Avatar size exceeds the 1MB limit",
+      });
+    }
+
+    const validMimeTypes = ["image/png", "image/jpeg"];
+    if (avatar && !validMimeTypes.includes(avatar.mimetype)) {
+      return res.status(400).json({
+        message: "Invalid file type. Only PNG, JPEG, and JPG are allowed",
+      });
+    }
 
     let avatarUrl;
     if (avatar) {
@@ -79,7 +88,8 @@ router.post("/:uid", upload.single("avatar"), async (req, res) => {
         });
         stream.on("error", (err) => {
           return res.status(500).json({
-            message: "Error uploading profile picture",
+            message: "Error uploading avatar",
+            error: err.message,
           });
         });
         stream.on("finish", async () => {

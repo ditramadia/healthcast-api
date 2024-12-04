@@ -1,4 +1,6 @@
 const express = require("express");
+const upload = require("../middleware/multer");
+const bucket = require("../db/bucket");
 const {
   isPostIdExists,
   getPosts,
@@ -37,9 +39,12 @@ router.get("/", async (req, res) => {
  * CREATE NEW POST
  * POST /posts
  */
-router.post("/", async (req, res) => {
-  // TODO: Use Multer to upload image instead of inserting the image_url in the body
-  const { uid, title, description = "", image_url = "" } = req.body;
+router.post("/", upload.single("image"), async (req, res) => {
+  const { uid, title, description = "" } = req.body;
+  const image = req.file;
+
+  console.log("body", req.body);
+  console.log("image", image);
 
   try {
     if (!uid)
@@ -59,7 +64,57 @@ router.post("/", async (req, res) => {
       });
     }
 
+    if (image && image.size > 1 * 1024 * 1024) {
+      return res.status(400).json({
+        message: "Image size exceeds the 1MB limit",
+      });
+    }
+
+    const validMimeTypes = ["image/png", "image/jpeg"];
+    if (image && !validMimeTypes.includes(image.mimetype)) {
+      return res.status(400).json({
+        message: "Invalid file type. Only PNG, JPEG, and JPG are allowed",
+      });
+    }
+
+    let image_url = "";
+    if (image) {
+      const date = new Date()
+        .toISOString()
+        .replace(/:/g, "-")
+        .replace(/\./g, "-");
+      const imageName = `${image.originalname}-${date}`;
+      const imageUpload = bucket.file(imageName);
+
+      image_url = await new Promise((resolve, reject) => {
+        const stream = imageUpload.createWriteStream({
+          metadata: {
+            contentType: image.mimetype,
+          },
+        });
+        stream.on("error", (err) => {
+          return res.status(500).json({
+            message: "Error uploading image",
+            error: err.message,
+          });
+        });
+        stream.on("finish", async () => {
+          try {
+            const [url] = await imageUpload.getSignedUrl({
+              action: "read",
+              expires: "01-01-2030",
+            });
+            resolve(url);
+          } catch (err) {
+            reject(err);
+          }
+        });
+        stream.end(req.file.buffer);
+      });
+    }
+
     await createPost({ uid, title, description, image_url });
+
     res.status(201).json({
       message: "Post created successfully",
     });
