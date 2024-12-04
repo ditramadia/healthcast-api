@@ -1,6 +1,7 @@
 const express = require("express");
 const upload = require("../middleware/multer");
 const uploadImage = require("../utils/uploadImage");
+const deleteImage = require("../utils/deleteImage");
 const {
   isPostIdExists,
   getPosts,
@@ -12,6 +13,7 @@ const {
   dislikePost,
 } = require("./post.service");
 const { isUserUidExists } = require("../user/user.service");
+const { getPostRefById } = require("./post.repository");
 const router = express.Router();
 
 /**
@@ -121,7 +123,6 @@ router.get("/:id", async (req, res) => {
  * EDIT POST BY ID
  * PUT /posts/:id
  */
-// TODO: Delete the file first before creating a upload the new image
 router.put("/:id", upload.single("image"), async (req, res) => {
   const { id } = req.params;
   const { title, description = "" } = req.body;
@@ -148,7 +149,19 @@ router.put("/:id", upload.single("image"), async (req, res) => {
       });
     }
 
-    const image_url = await uploadImage(image);
+    let image_url = "";
+    if (image) {
+      let currentPost = await getPostRefById(id);
+      currentPost = await currentPost.get();
+      currentPost = await currentPost.data();
+      const oldImageUrl = currentPost?.image_url;
+
+      if (oldImageUrl) {
+        await deleteImage(oldImageUrl);
+      }
+
+      image_url = await uploadImage(image);
+    }
 
     await updatePost(id, { title, description, image_url });
 
@@ -168,7 +181,6 @@ router.put("/:id", upload.single("image"), async (req, res) => {
  * DELETE /posts/:id
  */
 router.delete("/:id", async (req, res) => {
-  // TODO: Delete the image from storage as well
   const { id } = req.params;
 
   try {
@@ -177,6 +189,15 @@ router.delete("/:id", async (req, res) => {
       return res.status(404).json({
         message: `Post with id ${id} does not exist`,
       });
+    }
+
+    let currentPost = await getPostRefById(id);
+    currentPost = await currentPost.get();
+    currentPost = await currentPost.data();
+    const oldImageUrl = currentPost?.image_url;
+
+    if (oldImageUrl) {
+      await deleteImage(oldImageUrl);
     }
 
     await deletePost(id);
