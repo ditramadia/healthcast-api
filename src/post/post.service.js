@@ -1,3 +1,6 @@
+const uploadImage = require("../utils/uploadImage");
+const deleteImage = require("../utils/deleteImage");
+
 const {
   getAllPostsRef,
   getPostRefById,
@@ -82,20 +85,57 @@ const getPost = async (postId) => {
 const createPost = async (post) => {
   const { uid } = post;
   const userRef = await getUserRef(uid);
-  post.userRef = userRef;
 
-  await createNewPost(post);
+  const image_url = await uploadImage(post.image);
+
+  const newPost = {
+    userRef,
+    title: post.title,
+    description: post.description,
+    image_url,
+  };
+
+  await createNewPost(newPost);
 };
 
 // === UPDATE SERVICES =======
 
 const updatePost = async (postId, post) => {
-  await updatePostById(postId, post);
+  let image_url = "";
+  if (post.image) {
+    let currentPost = await getPostRefById(postId);
+    currentPost = await currentPost.get();
+    currentPost = await currentPost.data();
+    const oldImageUrl = currentPost?.image_url;
+
+    if (oldImageUrl) {
+      await deleteImage(oldImageUrl);
+    }
+
+    image_url = await uploadImage(post.image);
+  }
+
+  const newPost = {
+    title: post.title,
+    description: post.description,
+    image_url,
+  };
+
+  await updatePostById(postId, newPost);
 };
 
 // === DELETE SERVICES =======
 
 const deletePost = async (postId) => {
+  let currentPost = await getPostRefById(postId);
+  currentPost = await currentPost.get();
+  currentPost = await currentPost.data();
+  const oldImageUrl = currentPost?.image_url;
+
+  if (oldImageUrl) {
+    await deleteImage(oldImageUrl);
+  }
+
   await deletePostById(postId);
 };
 

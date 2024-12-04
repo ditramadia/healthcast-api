@@ -1,4 +1,6 @@
 const express = require("express");
+const upload = require("../middleware/multer");
+
 const {
   isPostIdExists,
   getPosts,
@@ -10,6 +12,7 @@ const {
   dislikePost,
 } = require("./post.service");
 const { isUserUidExists } = require("../user/user.service");
+const { getPostRefById } = require("./post.repository");
 const router = express.Router();
 
 /**
@@ -37,9 +40,9 @@ router.get("/", async (req, res) => {
  * CREATE NEW POST
  * POST /posts
  */
-router.post("/", async (req, res) => {
-  // TODO: Use Multer to upload image instead of inserting the image_url in the body
-  const { uid, title, description = "", image_url = "" } = req.body;
+router.post("/", upload.single("image"), async (req, res) => {
+  const { uid, title, description = "" } = req.body;
+  const image = req.file;
 
   try {
     if (!uid)
@@ -59,7 +62,21 @@ router.post("/", async (req, res) => {
       });
     }
 
-    await createPost({ uid, title, description, image_url });
+    if (image && image.size > 1 * 1024 * 1024) {
+      return res.status(400).json({
+        message: "Image size exceeds the 1MB limit",
+      });
+    }
+
+    const validMimeTypes = ["image/png", "image/jpeg"];
+    if (image && !validMimeTypes.includes(image.mimetype)) {
+      return res.status(400).json({
+        message: "Invalid file type. Only PNG, JPEG, and JPG are allowed",
+      });
+    }
+
+    await createPost({ uid, title, description, image });
+
     res.status(201).json({
       message: "Post created successfully",
     });
@@ -103,12 +120,25 @@ router.get("/:id", async (req, res) => {
  * EDIT POST BY ID
  * PUT /posts/:id
  */
-router.put("/:id", async (req, res) => {
+router.put("/:id", upload.single("image"), async (req, res) => {
   const { id } = req.params;
-  // TODO: Use Multer to upload image instead of inserting the image_url in the body
-  const { title, description = "", image_url = "" } = req.body;
+  const { title, description = "" } = req.body;
+  const image = req.file;
 
   try {
+    if (image && image.size > 1 * 1024 * 1024) {
+      return res.status(400).json({
+        message: "Image size exceeds the 1MB limit",
+      });
+    }
+
+    const validMimeTypes = ["image/png", "image/jpeg"];
+    if (image && !validMimeTypes.includes(image.mimetype)) {
+      return res.status(400).json({
+        message: "Invalid file type. Only PNG, JPEG, and JPG are allowed",
+      });
+    }
+
     const isPostExists = await isPostIdExists(id);
     if (!isPostExists) {
       return res.status(404).json({
@@ -116,7 +146,7 @@ router.put("/:id", async (req, res) => {
       });
     }
 
-    await updatePost(id, { title, description, image_url });
+    await updatePost(id, { title, description, image });
 
     res.status(200).json({
       message: "Post updated successfully",

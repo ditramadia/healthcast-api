@@ -8,6 +8,7 @@ const serviceAccount = {
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
+  storageBucket: "gs://healthcast-617a7.firebasestorage.app",
 });
 
 module.exports = admin;
