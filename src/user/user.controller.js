@@ -1,6 +1,7 @@
 const express = require("express");
 const upload = require("../middleware/multer");
-const bucket = require("../db/bucket");
+const uploadImage = require("../utils/uploadImage");
+
 const {
   isUserUidExists,
   getUserData,
@@ -71,48 +72,14 @@ router.post("/:uid", upload.single("avatar"), async (req, res) => {
         message: `User with uid ${uid} does not exist`,
       });
 
-    let avatarUrl = "";
-    if (avatar) {
-      const date = new Date()
-        .toISOString()
-        .replace(/:/g, "-")
-        .replace(/\./g, "-");
-      const avatarName = `${avatar.originalname}-${date}`;
-      const avatarUpload = bucket.file(avatarName);
-
-      avatarUrl = await new Promise((resolve, reject) => {
-        const stream = avatarUpload.createWriteStream({
-          metadata: {
-            contentType: avatar.mimetype,
-          },
-        });
-        stream.on("error", (err) => {
-          return res.status(500).json({
-            message: "Error uploading avatar",
-            error: err.message,
-          });
-        });
-        stream.on("finish", async () => {
-          try {
-            const [url] = await avatarUpload.getSignedUrl({
-              action: "read",
-              expires: "01-01-2030",
-            });
-            resolve(url);
-          } catch (err) {
-            reject(err);
-          }
-        });
-        stream.end(req.file.buffer);
-      });
-    }
+    const avatar_url = await uploadImage(avatar);
 
     const updatedProfile = {
       fullName,
     };
     if (gender) updatedProfile.gender = gender;
     if (age) updatedProfile.age = age;
-    if (avatar) updatedProfile.avatar_url = avatarUrl;
+    if (avatar) updatedProfile.avatar_url = avatar_url;
 
     await updateUserData(uid, updatedProfile);
 

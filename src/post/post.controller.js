@@ -1,6 +1,6 @@
 const express = require("express");
 const upload = require("../middleware/multer");
-const bucket = require("../db/bucket");
+const uploadImage = require("../utils/uploadImage");
 const {
   isPostIdExists,
   getPosts,
@@ -43,9 +43,6 @@ router.post("/", upload.single("image"), async (req, res) => {
   const { uid, title, description = "" } = req.body;
   const image = req.file;
 
-  console.log("body", req.body);
-  console.log("image", image);
-
   try {
     if (!uid)
       return res.status(400).json({
@@ -77,41 +74,7 @@ router.post("/", upload.single("image"), async (req, res) => {
       });
     }
 
-    let image_url = "";
-    if (image) {
-      const date = new Date()
-        .toISOString()
-        .replace(/:/g, "-")
-        .replace(/\./g, "-");
-      const imageName = `${image.originalname}-${date}`;
-      const imageUpload = bucket.file(imageName);
-
-      image_url = await new Promise((resolve, reject) => {
-        const stream = imageUpload.createWriteStream({
-          metadata: {
-            contentType: image.mimetype,
-          },
-        });
-        stream.on("error", (err) => {
-          return res.status(500).json({
-            message: "Error uploading image",
-            error: err.message,
-          });
-        });
-        stream.on("finish", async () => {
-          try {
-            const [url] = await imageUpload.getSignedUrl({
-              action: "read",
-              expires: "01-01-2030",
-            });
-            resolve(url);
-          } catch (err) {
-            reject(err);
-          }
-        });
-        stream.end(req.file.buffer);
-      });
-    }
+    const image_url = await uploadImage(image);
 
     await createPost({ uid, title, description, image_url });
 
@@ -185,41 +148,7 @@ router.put("/:id", upload.single("image"), async (req, res) => {
       });
     }
 
-    let image_url = "";
-    if (image) {
-      const date = new Date()
-        .toISOString()
-        .replace(/:/g, "-")
-        .replace(/\./g, "-");
-      const imageName = `${image.originalname}-${date}`;
-      const imageUpload = bucket.file(imageName);
-
-      image_url = await new Promise((resolve, reject) => {
-        const stream = imageUpload.createWriteStream({
-          metadata: {
-            contentType: image.mimetype,
-          },
-        });
-        stream.on("error", (err) => {
-          return res.status(500).json({
-            message: "Error uploading avatar",
-            error: err.message,
-          });
-        });
-        stream.on("finish", async () => {
-          try {
-            const [url] = await imageUpload.getSignedUrl({
-              action: "read",
-              expires: "01-01-2030",
-            });
-            resolve(url);
-          } catch (err) {
-            reject(err);
-          }
-        });
-        stream.end(req.file.buffer);
-      });
-    }
+    const image_url = await uploadImage(image);
 
     await updatePost(id, { title, description, image_url });
 
