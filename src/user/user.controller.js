@@ -47,12 +47,6 @@ router.post("/:uid", upload.single("avatar"), async (req, res) => {
   const avatar = req.file;
 
   try {
-    const isUserExists = await isUserUidExists(uid);
-    if (!isUserExists)
-      return res.status(404).json({
-        message: `User with uid ${uid} does not exist`,
-      });
-
     if (!fullName)
       return res.status(400).json({
         message: "Missing required field: Full Name",
@@ -71,7 +65,13 @@ router.post("/:uid", upload.single("avatar"), async (req, res) => {
       });
     }
 
-    let avatarUrl;
+    const isUserExists = await isUserUidExists(uid);
+    if (!isUserExists)
+      return res.status(404).json({
+        message: `User with uid ${uid} does not exist`,
+      });
+
+    let avatarUrl = "";
     if (avatar) {
       const date = new Date()
         .toISOString()

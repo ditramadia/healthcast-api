@@ -158,16 +158,66 @@ router.get("/:id", async (req, res) => {
  * EDIT POST BY ID
  * PUT /posts/:id
  */
-router.put("/:id", async (req, res) => {
+// TODO: Delete the file first before creating a upload the new image
+router.put("/:id", upload.single("image"), async (req, res) => {
   const { id } = req.params;
-  // TODO: Use Multer to upload image instead of inserting the image_url in the body
-  const { title, description = "", image_url = "" } = req.body;
+  const { title, description = "" } = req.body;
+  const image = req.file;
 
   try {
+    if (image && image.size > 1 * 1024 * 1024) {
+      return res.status(400).json({
+        message: "Image size exceeds the 1MB limit",
+      });
+    }
+
+    const validMimeTypes = ["image/png", "image/jpeg"];
+    if (image && !validMimeTypes.includes(image.mimetype)) {
+      return res.status(400).json({
+        message: "Invalid file type. Only PNG, JPEG, and JPG are allowed",
+      });
+    }
+
     const isPostExists = await isPostIdExists(id);
     if (!isPostExists) {
       return res.status(404).json({
         message: `Post with id ${id} does not exist`,
+      });
+    }
+
+    let image_url = "";
+    if (image) {
+      const date = new Date()
+        .toISOString()
+        .replace(/:/g, "-")
+        .replace(/\./g, "-");
+      const imageName = `${image.originalname}-${date}`;
+      const imageUpload = bucket.file(imageName);
+
+      image_url = await new Promise((resolve, reject) => {
+        const stream = imageUpload.createWriteStream({
+          metadata: {
+            contentType: image.mimetype,
+          },
+        });
+        stream.on("error", (err) => {
+          return res.status(500).json({
+            message: "Error uploading avatar",
+            error: err.message,
+          });
+        });
+        stream.on("finish", async () => {
+          try {
+            const [url] = await imageUpload.getSignedUrl({
+              action: "read",
+              expires: "01-01-2030",
+            });
+            resolve(url);
+          } catch (err) {
+            reject(err);
+          }
+        });
+        stream.end(req.file.buffer);
       });
     }
 
@@ -189,6 +239,7 @@ router.put("/:id", async (req, res) => {
  * DELETE /posts/:id
  */
 router.delete("/:id", async (req, res) => {
+  // TODO: Delete the image from storage as well
   const { id } = req.params;
 
   try {
