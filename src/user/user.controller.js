@@ -1,9 +1,12 @@
 const express = require("express");
+const upload = require("../middleware/multer");
+
 const {
   isUserUidExists,
   getUserData,
   updateUserData,
 } = require("./user.service");
+
 const router = express.Router();
 
 /**
@@ -38,20 +41,34 @@ router.get("/:uid", async (req, res) => {
  * EDIT USER PROFILE
  * POST /users/:uid
  */
-router.post("/:uid", async (req, res) => {
+router.post("/:uid", upload.single("avatar"), async (req, res) => {
   const { uid } = req.params;
   const { fullName, gender, age } = req.body;
+  const avatar = req.file;
 
   try {
+    if (!fullName)
+      return res.status(400).json({
+        message: "Missing required field: Full Name",
+      });
+
+    if (avatar && avatar.size > 1 * 1024 * 1024) {
+      return res.status(400).json({
+        message: "Avatar size exceeds the 1MB limit",
+      });
+    }
+
+    const validMimeTypes = ["image/png", "image/jpeg"];
+    if (avatar && !validMimeTypes.includes(avatar.mimetype)) {
+      return res.status(400).json({
+        message: "Invalid file type. Only PNG, JPEG, and JPG are allowed",
+      });
+    }
+
     const isUserExists = await isUserUidExists(uid);
     if (!isUserExists)
       return res.status(404).json({
         message: `User with uid ${uid} does not exist`,
-      });
-
-    if (!fullName)
-      return res.status(400).json({
-        message: "Missing required field: Full Name",
       });
 
     const updatedProfile = {
@@ -59,6 +76,7 @@ router.post("/:uid", async (req, res) => {
     };
     if (gender) updatedProfile.gender = gender;
     if (age) updatedProfile.age = age;
+    if (avatar) updatedProfile.avatar = avatar;
 
     await updateUserData(uid, updatedProfile);
 
